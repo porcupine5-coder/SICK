@@ -1,0 +1,53 @@
+[llm]
+default_provider = "google"
+default_model = "Gemini 3.5 Flash-Lite"
+temperature = 0.2
+max_tokens = 64000
+# Optional: override the API base URL (e.g. an OpenAI-compatible endpoint).
+# base_url = "https://api.openai.com/v1"
+
+# Optional: providers to try when every key of the primary provider is
+# unusable (rate limited, invalid, quota/context exhausted).
+# fallback_chain = [
+#   { provider = "anthropic", model = "claude-3-7-sonnet-20250219" },
+#   { provider = "google", model = "gemini-2.0-flash" },
+# ]
+
+# Example: Google Gemini via its OpenAI-compatible endpoint
+# (uses GOOGLE_API_KEY or GEMINI_API_KEY; base_url is set automatically).
+# [llm]
+# default_provider = "google"
+# default_model = "Gemini 3.5 Flash-Lite"
+
+# ---------------------------------------------------------------------------
+# Phase 6 sections (all optional)
+# ---------------------------------------------------------------------------
+
+# MCP servers (Model Context Protocol) started alongside the agent. Their
+# tools join the tool registry with names like "filesystem-read_file".
+# [mcp]
+# servers = [
+#   { name = "filesystem", command = "npx", args = ["-y", "@modelcontextprotocol/server-filesystem", "."] },
+#   { name = "search", command = "some-mcp-server", args = ["--stdio"], env = { API_KEY = "..." }, timeout_ms = 60000 },
+# ]
+
+# Sandboxed execution for the `bash` tool (fail-closed: commands are refused
+# when the requested backend is unavailable). Modes: "bwrap"/"firejail"
+# (Linux), "container" (Docker, any OS; needs `image`).
+# [sandbox]
+# enabled = false
+# mode = "container"            # or "bwrap" / "firejail"
+# allowed_dirs = ["/data/shared"]
+# deny_network = false
+# image = "ubuntu:24.04"
+
+# Dynamic-library extensions (plugins). Drop `.dll`/`.so`/`.dylib` files into
+# this directory; they are trusted code loaded at startup. Empty = <SICK_HOME>/extensions.
+# [extensions]
+# dir = "~/.sick/extensions"
+
+# Local web UI. `sick web [--port N]` serves the chat page (bound to 127.0.0.1);
+# with `enabled = true` the interactive TUI also starts it in the background.
+# [web]
+# enabled = false
+# port = 8080

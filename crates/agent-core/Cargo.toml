@@ -1,0 +1,34 @@
+[package]
+name = "shell-agent-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+shell-common = { path = "../common" }
+shell-llm = { path = "../llm" }
+shell-key-manager = { path = "../key-manager" }
+shell-memory = { path = "../memory" }
+shell-tools = { path = "../tools" }
+shell-config = { path = "../config" }
+shell-mcp = { path = "../mcp" }
+shell-extensions = { path = "../extensions" }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+async-trait = { workspace = true }
+mockito = { workspace = true }
+tokio-test = { workspace = true }
+tempfile = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "agent_bench"
+harness = false

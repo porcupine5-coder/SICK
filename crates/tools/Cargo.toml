@@ -1,0 +1,23 @@
+[package]
+name = "shell-tools"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+shell-common = { path = "../common" }
+shell-shell = { path = "../shell" }
+shell-config = { path = "../config" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+ignore = { workspace = true }
+regex = { workspace = true }
+globset = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

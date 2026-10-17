@@ -1,0 +1,19 @@
+[package]
+name = "shell-extension-example"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Example/plugin fixture for S.I.C.K's extensions system (Phase 6)"
+
+[lib]
+name = "example_extension"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+shell-extensions = { path = "../extensions" }
+shell-tools = { path = "../tools" }
+shell-llm = { path = "../llm" }
+async-trait = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }

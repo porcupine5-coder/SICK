@@ -1,0 +1,24 @@
+[package]
+name = "shell-web-ui"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+shell-agent-core = { path = "../agent-core" }
+axum = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+shell-common = { path = "../common" }
+shell-key-manager = { path = "../key-manager" }
+shell-llm = { path = "../llm" }
+shell-memory = { path = "../memory" }
+async-trait = { workspace = true }
+tokio-tungstenite = { workspace = true }
+futures-util = { workspace = true }
+tempfile = { workspace = true }

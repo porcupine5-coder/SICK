@@ -1,0 +1,20 @@
+[package]
+name = "shell-extensions"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+shell-common = { path = "../common" }
+shell-config = { path = "../config" }
+shell-tools = { path = "../tools" }
+shell-llm = { path = "../llm" }
+libloading = { workspace = true }
+tracing = { workspace = true }
+dirs = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+tokio = { workspace = true }
+serde_json = { workspace = true }

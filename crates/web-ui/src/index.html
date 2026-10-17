@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SICK web UI</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; height: 100vh; display: flex; flex-direction: column;
+    font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: #101318; color: #d7dde7;
+  }
+  header { padding: 10px 16px; border-bottom: 1px solid #262c37; color: #9aa7b8; }
+  header b { color: #7ee0a3; }
+  #log { flex: 1; overflow-y: auto; padding: 12px 16px; white-space: pre-wrap; }
+  .msg { margin-bottom: 10px; }
+  .msg.user .who { color: #7aa2f7; }
+  .msg.assistant .who { color: #7ee0a3; }
+  .msg.error .who { color: #f7768e; }
+  .msg.tool .who { color: #e0af68; }
+  .who { font-weight: bold; margin-right: 8px; }
+  .tool-output { color: #8a93a3; }
+  form { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #262c37; }
+  input {
+    flex: 1; padding: 10px 12px; border-radius: 6px; border: 1px solid #333c4d;
+    background: #171b23; color: inherit; font: inherit;
+  }
+  input:focus { outline: none; border-color: #7aa2f7; }
+  button {
+    padding: 10px 18px; border: 0; border-radius: 6px; background: #2f6fed; color: white;
+    font: inherit; cursor: pointer;
+  }
+  button:disabled { background: #2a3448; color: #7c8698; cursor: default; }
+  #status { padding: 0 16px 10px; color: #7c8698; font-size: 12px; }
+</style>
+</head>
+<body>
+<header><b>SICK</b> web UI — one shared session; streams tokens, tool calls, and results over WebSocket.</header>
+<div id="log"></div>
+<div id="status">connecting…</div>
+<form id="composer" autocomplete="off">
+  <input id="prompt" placeholder="Type a prompt and press Enter" disabled>
+  <button id="send" disabled>Send</button>
+</form>
+<script>
+(() => {
+  const log = document.getElementById('log');
+  const status = document.getElementById('status');
+  const form = document.getElementById('composer');
+  const input = document.getElementById('prompt');
+  const send = document.getElementById('send');
+  let socket = null;
+  let current = null; // element receiving streamed assistant tokens
+
+  const addMessage = (who, text, cls) => {
+    const div = document.createElement('div');
+    div.className = 'msg ' + cls;
+    const name = document.createElement('span');
+    name.className = 'who';
+    name.textContent = who;
+    const body = document.createElement('span');
+    body.textContent = text || '';
+    div.append(name, body);
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return body;
+  };
+
+  const addOutput = (text) => {
+    const out = document.createElement('div');
+    out.className = 'msg tool tool-output';
+    out.textContent = text.length > 2000 ? text.slice(0, 2000) + '…' : text;
+    log.appendChild(out);
+    log.scrollTop = log.scrollHeight;
+  };
+
+  const setBusy = (busy) => {
+    input.disabled = busy;
+    send.disabled = busy;
+    if (!busy) input.focus();
+  };
+
+  const handle = (msg) => {
+    switch (msg.type) {
+      case 'accepted':
+        status.textContent = 'working…';
+        setBusy(true);
+        current = addMessage('assistant', '', 'assistant');
+        break;
+      case 'token':
+        if (!current) current = addMessage('assistant', '', 'assistant');
+        current.textContent += msg.text;
+        log.scrollTop = log.scrollHeight;
+        break;
+      case 'tool_call':
+        addMessage('tool', '→ ' + msg.name + ' ' + JSON.stringify(msg.args), 'tool');
+        break;
+      case 'tool_result':
+        addMessage('tool', (msg.success ? '✓ ' : '✗ ') + msg.name + ' (' + msg.duration_ms + 'ms)', 'tool');
+        if (msg.output) addOutput(msg.output);
+        break;
+      case 'subagent_started':
+      case 'subagent_token':
+      case 'subagent_tool_call':
+      case 'subagent_finished':
+        status.textContent = 'subagent: ' + (msg.name || '') + '…';
+        break;
+      case 'done':
+        status.textContent = 'done (' + msg.iterations + ' iteration(s), ' + msg.tool_calls + ' tool call(s))';
+        current = null;
+        setBusy(false);
+        break;
+      case 'error':
+        addMessage('error', msg.message || 'unknown error', 'error');
+        status.textContent = 'error';
+        current = null;
+        setBusy(false);
+        break;
+    }
+  };
+
+  const connect = () => {
+    const scheme = location.protocol === 'https:' ? 'wss://' : 'ws://';
+    socket = new WebSocket(scheme + location.host + '/ws');
+    socket.onopen = () => { status.textContent = 'connected'; setBusy(false); };
+    socket.onclose = () => { status.textContent = 'disconnected — reload to reconnect'; setBusy(true); };
+    socket.onerror = () => { status.textContent = 'connection error'; };
+    socket.onmessage = (event) => {
+      let msg;
+      try { msg = JSON.parse(event.data); } catch { return; }
+      handle(msg);
+    };
+  };
+
+  form.onsubmit = (event) => {
+    event.preventDefault();
+    const text = input.value.trim();
+    if (!text || !socket || socket.readyState !== WebSocket.OPEN) return;
+    addMessage('user', text, 'user');
+    input.value = '';
+    socket.send(JSON.stringify({ prompt: text }));
+  };
+
+  connect();
+})();
+</script>
+</body>
+</html>

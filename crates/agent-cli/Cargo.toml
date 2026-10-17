@@ -1,0 +1,35 @@
+[package]
+name = "shell-agent-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "sick"
+path = "src/main.rs"
+
+[dependencies]
+clap = { workspace = true }
+clap_complete = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde_json = { workspace = true }
+rpassword = { workspace = true }
+shell-agent-core = { path = "../agent-core" }
+shell-common = { path = "../common" }
+shell-config = { path = "../config" }
+shell-key-manager = { path = "../key-manager" }
+shell-memory = { path = "../memory" }
+shell-shell = { path = "../shell" }
+shell-extensions = { path = "../extensions" }
+shell-web-ui = { path = "../web-ui" }
+shell-tui = { path = "../tui" }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+shell-mcp = { path = "../mcp" }
+tokio-tungstenite = { workspace = true }
+futures-util = { workspace = true }

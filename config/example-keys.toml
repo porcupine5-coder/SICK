@@ -1,0 +1,49 @@
+# SICK keys file — copy to ~/.sick/keys.toml
+#
+# (`sick keys add` writes here for you; the legacy ~/.shell-agent/keys.toml
+# location still works when ~/.sick does not exist.)
+#
+# Each `[provider]` section holds an ordered list of keys. The first healthy
+# key is used, and the agent rotates to the next key automatically when one is
+# rate limited (429), rejected (401/403), or out of quota/context.
+#
+# A key entry can be:
+#   "sk-literal..."            — the literal secret
+#   { env = "MY_ENV_VAR" }     — read from an environment variable at startup
+#   { value = "sk-literal" }   — same as the bare string form
+#
+# Optional per-provider settings:
+#   base_url       — override the endpoint (any OpenAI-compatible server)
+#   default_model  — default model for this provider
+#   context_window — context window override (tokens)
+
+[openai]
+keys = [
+    { env = "OPENAI_API_KEY_1" },
+    { env = "OPENAI_API_KEY_2" },
+]
+# base_url = "https://api.openai.com/v1"
+# default_model = "gpt-4.1"
+
+[anthropic]
+keys = [{ env = "ANTHROPIC_API_KEY" }]
+# base_url = "https://api.anthropic.com"
+
+[google]
+keys = [{ env = "GOOGLE_API_KEY" }]
+# base_url = "https://generativelanguage.googleapis.com/v1beta"
+
+[deepseek]
+keys = [{ env = "DEEPSEEK_API_KEY" }]
+# base_url = "https://api.deepseek.com/v1"
+
+[openrouter]
+keys = [{ env = "OPENROUTER_API_KEY" }]
+# base_url = "https://openrouter.ai/api/v1"
+
+# Custom OpenAI-compatible provider (e.g. a local llama.cpp server).
+# [my-local-llama]
+# keys = [{ value = "not-needed" }]
+# base_url = "http://localhost:8080/v1"
+# default_model = "qwen2.5-7b"
+# context_window = 32768
